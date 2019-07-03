@@ -1,48 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/data/database.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_app/state/theme_state.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'state/app_state.dart';
 import 'data/todo_model.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(Root());
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class Root extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(builder: (_) => AppState()),
+        ChangeNotifierProvider(builder: (_) => ThemeState()),
       ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: MyHomePage(title: 'TodosTest'),
-      ),
+      child: MyApp(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  Widget build(BuildContext context) {
+    final themeData = Provider.of<ThemeState>(context);
+    return MaterialApp(
+      title: 'Todo',
+      theme: themeData.getTheme(),
+      home: MyHomePage(),
+    );
+  }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class MyHomePage extends StatelessWidget {
   final List<Widget> _children = [Todos(), Completed()];
 
   @override
   Widget build(BuildContext context) {
+    final themeData = Provider.of<ThemeState>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text('Todos'),
+        actions: <Widget>[
+          IconButton(
+            icon: IconTheme(
+              data: IconThemeData(
+                  color: themeData.isDark ? Colors.white : Colors.black),
+              child: Icon(themeData.isDark
+                  ? FontAwesomeIcons.solidSun
+                  : FontAwesomeIcons.solidMoon),
+            ),
+            onPressed: () {
+              themeData.setTheme();
+            },
+          )
+        ],
       ),
       body: _children[Provider.of<AppState>(context).bottomIndex],
       bottomNavigationBar: BottomNavigationBar(
