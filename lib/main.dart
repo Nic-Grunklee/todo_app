@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
       title: 'Todo',
       theme: themeData.getTheme(),
       home: MyHomePage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
