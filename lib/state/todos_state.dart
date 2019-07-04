@@ -66,7 +66,7 @@ class TodosState with ChangeNotifier {
     await _getUncompletedWithoutIcon();
   }
 
-  void completeTodo(Todo todo) async {
+  Future<void> completeTodo(Todo todo) async {
     await DBProvider.db.completedOrUncompleteTask(todo);
     await _getUncompletedWithoutIcon();
   }
