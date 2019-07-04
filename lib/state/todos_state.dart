@@ -61,7 +61,7 @@ class TodosState with ChangeNotifier {
     notifyListeners();
   }
 
-  void saveTodo(String todo) async {
+  Future<void> saveTodo(String todo) async {
     await DBProvider.db.newTodo(todo);
     await _getUncompletedWithoutIcon();
   }
