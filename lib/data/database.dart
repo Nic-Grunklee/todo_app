@@ -27,8 +27,6 @@ class DBProvider {
   initDB() async {
     var databasesPath = await getDatabasesPath();
     String path = join(databasesPath, 'main.db');
-    // Delete the database
-    await deleteDatabase(path);
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int versions) async {
       await db.execute("CREATE TABLE Todo ("
