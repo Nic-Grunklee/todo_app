@@ -58,8 +58,8 @@ class MyHomePage extends StatelessWidget {
                   ? FontAwesomeIcons.solidSun
                   : FontAwesomeIcons.solidMoon),
             ),
-            onPressed: () {
-              themeData.setTheme();
+            onPressed: () async {
+               await themeData.setTheme();
             },
           )
         ],

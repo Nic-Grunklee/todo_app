@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:todo_app/data/preference_model.dart';
 import 'package:todo_app/data/todo_model.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -19,7 +19,9 @@ class DBProvider {
     else {
       _database = await initDB();
       List<Todo> todos = await getAllTodos();
+      List<Preference> prefs = await getAllPrefences();
       if (todos.length == 0) await enterStartingData();
+      if (prefs.length == 0) await enterStartingPrefs();
     }
     return _database;
   }
@@ -27,8 +29,14 @@ class DBProvider {
   initDB() async {
     var databasesPath = await getDatabasesPath();
     String path = join(databasesPath, 'main.db');
+    await deleteDatabase(path);
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int versions) async {
+      await db.execute("CREATE TABLE Preferences ("
+          "id INTEGER PRIMARY KEY,"
+          "key Text,"
+          "value Text"
+          ")");
       await db.execute("CREATE TABLE Todo ("
           "id INTEGER PRIMARY KEY,"
           "item Text,"
@@ -46,14 +54,30 @@ class DBProvider {
     return res;
   }
 
+  changePreferenceSetting(Preference preference) async {
+    final db = await database;
+    return await db.update("Preferences", preference.toMap(),
+        where: "id = ?", whereArgs: [preference.id]);
+  }
+
   enterStartingData() async {
     final db = await database;
     var table = await db.rawQuery("SELECT MAX(id)+1 as id FROM Todo");
     int id = table.first['id'];
-    var insert = await db.rawInsert(
+    await db.rawInsert(
         "INSERT Into Todo (id,item,completed)"
         " VALUES (?,?,?)",
         [id, 'Todo1', false]);
+  }
+
+  enterStartingPrefs() async {
+    final db = await database;
+    var table = await db.rawQuery("SELECT MAX(id)+1 as id FROM Preferences");
+    int id = table.first['id'];
+    await db.rawInsert(
+        "INSERT Into Preferences (id,key,value)"
+        " VALUES (?,?,?)",
+        [id, 'theme', 'dark']);
   }
 
   newTodo(String item) async {
@@ -69,7 +93,6 @@ class DBProvider {
   deleteAllCompletedTodos() async {
     final db = await database;
     return await db.delete("Todo", where: "completed = ?", whereArgs: [1]);
-    
   }
 
   Future<List<Todo>> getAllTodos() async {
@@ -77,6 +100,14 @@ class DBProvider {
     var res = await db.query("Todo");
     List<Todo> list =
         res.isNotEmpty ? res.map((t) => Todo.fromMap(t)).toList() : [];
+    return list;
+  }
+
+  Future<List<Preference>> getAllPrefences() async {
+    final db = await database;
+    var res = await db.query("Preferences");
+    List<Preference> list =
+        res.isNotEmpty ? res.map((p) => Preference.fromMap(p)).toList() : [];
     return list;
   }
 
@@ -91,7 +122,8 @@ class DBProvider {
   Future<List<Todo>> getCompletedTodos() async {
     final db = await database;
     var res = await db.query("Todo", where: "completed = ?", whereArgs: [1]);
-    List<Todo> list = res.isNotEmpty ? res.map((t) => Todo.fromMap(t)).toList() : [];
+    List<Todo> list =
+        res.isNotEmpty ? res.map((t) => Todo.fromMap(t)).toList() : [];
     return list;
   }
 
