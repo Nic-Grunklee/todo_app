@@ -14,8 +14,11 @@ class DBProvider {
   Database _database;
 
   Future<Database> get database async {
-    if (_database != null)
+    if (_database != null) {
+      await initDB();
       return _database;
+      
+    }
     else {
       _database = await initDB();
     }
@@ -27,12 +30,12 @@ class DBProvider {
     String path = join(databasesPath, 'main.db');
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int versions) async {
-      await db.execute("CREATE TABLE Preferences ("
+      await db.execute("CREATE TABLE IF NOT EXISTS Preferences ("
           "id INTEGER PRIMARY KEY,"
           "key Text,"
           "value Text"
           ")");
-      await db.execute("CREATE TABLE Todo ("
+      await db.execute("CREATE TABLE IF NOT EXISTS Todo ("
           "id INTEGER PRIMARY KEY,"
           "item Text,"
           "completed BIT"

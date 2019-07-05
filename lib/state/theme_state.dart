@@ -54,6 +54,6 @@ class ThemeState with ChangeNotifier {
   List<Preference> _prefs = [];
 
   _getAllPrefences() async {
-    await DBProvider.db.getAllPrefences().then((result) => {_prefs = result});
+    await DBProvider.db.getAllPrefences().then((result) => _prefs = result);
   }
 }
