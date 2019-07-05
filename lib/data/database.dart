@@ -18,10 +18,6 @@ class DBProvider {
       return _database;
     else {
       _database = await initDB();
-      List<Todo> todos = await getAllTodos();
-      List<Preference> prefs = await getAllPrefences();
-      if (todos.length == 0) await enterStartingData();
-      if (prefs.length == 0) await enterStartingPrefs();
     }
     return _database;
   }
@@ -29,7 +25,6 @@ class DBProvider {
   initDB() async {
     var databasesPath = await getDatabasesPath();
     String path = join(databasesPath, 'main.db');
-    await deleteDatabase(path);
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int versions) async {
       await db.execute("CREATE TABLE Preferences ("
@@ -88,6 +83,16 @@ class DBProvider {
         "INSERT Into Todo (id,item,completed)"
         " VALUES (?,?,?)",
         [id, item, false]);
+  }
+
+  newPreference(Preference pref) async {
+    final db = await database;
+    var table = await db.rawQuery("SELECT MAX(id)+1 as id FROM Preferences");
+    int id = table.first['id'];
+    await db.rawInsert(
+        "INSERT Into Preferences (id,key,value)"
+        " VALUES (?,?,?)",
+        [id, pref.key, pref.value]);
   }
 
   deleteAllCompletedTodos() async {

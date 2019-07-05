@@ -7,31 +7,43 @@ class ThemeState with ChangeNotifier {
   ThemeData light = ThemeData.light();
   ThemeData dark = ThemeData.dark();
 
-  bool isDark = true;
+  bool isDark = false;
 
   ThemeState() {
     init();
   }
 
-  ThemeData getTheme () => _themeData;
+  ThemeData getTheme() => _themeData;
 
   Future<void> init() async {
+    Preference theme;
     await _getAllPrefences();
-    Preference value = _prefs.firstWhere((pref) => pref.key == 'theme');
-    String theme = value.value;
-    if(theme == 'light') {
-      _themeData = light;
-    } else if(theme == 'dark') {
-      _themeData = dark;
+    var result =
+        _prefs.firstWhere((pref) => pref.key == 'theme', orElse: () => null);
+    if(result != null) {
+       theme = _prefs.firstWhere((pref) => pref.key == 'theme');
+    } else {
+      theme = new Preference();
+      theme.key = 'theme';
+      theme.value = 'light';
+      await DBProvider.db.newPreference(theme);
     }
+    if (theme.value == 'light') {
+      _themeData = light;
+      isDark = false;
+    } else if (theme.value == 'dark') {
+      _themeData = dark;
+      isDark = true;
+    }
+    await _getAllPrefences();
     notifyListeners();
   }
 
-  setTheme() async { 
+  setTheme() async {
     Preference themeData = _prefs.firstWhere((pref) => pref.key == 'theme');
-    if(themeData.value == 'dark') {
+    if (themeData.value == 'dark') {
       themeData.value = 'light';
-    } else if (themeData.value =='light') {
+    } else if (themeData.value == 'light') {
       themeData.value = 'dark';
     }
 
@@ -42,8 +54,6 @@ class ThemeState with ChangeNotifier {
   List<Preference> _prefs = [];
 
   _getAllPrefences() async {
-    await DBProvider.db.getAllPrefences().then((result) => {
-      _prefs = result
-    });
+    await DBProvider.db.getAllPrefences().then((result) => {_prefs = result});
   }
 }
