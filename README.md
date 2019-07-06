@@ -1,6 +1,6 @@
 # Todo App
 
-A simple todo app
+A simple todo app currently in closed Alpha for Android devices(working towards Alpha release on iOS devices)
 
 <img src="/screenshots/before.png?raw=true" height="400"/> <img src="/screenshots/list.png?raw=true" height="400"/> <img src="/screenshots/completed.png?raw=true" height="400"/> 
 
