@@ -2,4 +2,4 @@
 
 A simple todo app
 
-![Alt text](/screenshots/efore.jpg?raw=true "No Todos")
+![Alt text](/screenshots/efore.png?raw=true "No Todos")
