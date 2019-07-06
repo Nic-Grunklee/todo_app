@@ -2,4 +2,5 @@
 
 A simple todo app
 
-![Alt text](/screenshots/before.png?raw=true "No Todos")
+<img src="/screenshots/before.png?raw=true" height="400"/>
+
